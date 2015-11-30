@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from flask import Flask, render_template, redirect, url_for, make_response, request
+from flask import Flask, render_template, redirect, url_for, make_response, request, jsonify
 import os
 app = Flask(__name__)
 app.debug = True
@@ -9,6 +9,7 @@ app.debug = True
 def hello_world():
     return 'Hello World!'
 """
+_evaluation_method = object
 
 @app.route('/')
 def hello_world():
@@ -57,7 +58,14 @@ def description():
 
 @app.route('/evaluation')
 def evaluation():
-    return render_template('evaluations.html')
+    accu = _evaluation_method.get('accuracy', None)
+    corr = _evaluation_method.get('correlation', None)
+    print _evaluation_method
+    if accu and corr:
+        print accu[5:]
+        print corr
+        return render_template('evaluations.html', accuracy=accu[5:], correlation=corr)
+    return render_template('evaluations.html', accuracy=None, correlation=None)
 
 @app.route('/information')
 def info():
@@ -71,5 +79,23 @@ def del_file():
     resp.set_cookie('filename', '', expires=0)
     return resp
 
+@app.route('/test_evaluation_method')
+def test_evaluation_method():
+    return jsonify(rescode="00000")
+
+@app.route('/submit_evaluation')
+def submit_evaluation():
+    args = request.args
+    accuracy = 'Accu@%s' % args.get('accuracy', '$')
+    correlation = args.get('correlation', '@')
+
+    if not accuracy.endswith('$') and not correlation.endswith('@'):
+        _evaluation_method['accuracy'] = accuracy
+        _evaluation_method['correlation'] = correlation
+        return redirect(url_for('home'))
+    else:
+        return "发生未知错误, 请重试!!"
+
 if __name__ == '__main__':
+    _evaluation_method = dict()
     app.run(host='0.0.0.0')
