@@ -7,6 +7,25 @@
     <script src="/static/jquery/jquery-1.11.3.min.js"></script>
     <script src="/static/js/bootstrap.min.js"></script>
     <title>评测方式</title>
+    <script type="text/javascript">
+        function save(){
+            $.getJSON('/test_evaluation_method', function(data){
+                if(data.rescode == "00000"){
+                   var ff = document.getElementById('evaluation_name')
+                   var evaluation = "Accu@" + document.getElementById('accuracy').value
+                   var correlation = document.getElementById('correlation').value
+                   if (confirm("你选择的评测方式是: " + "Accuracy: " + evaluation + ", Correlation coefficient: " + correlation + ". 是否保存?")){
+                       ff.submit()
+                   }else{
+                       return;
+                   }
+               }else{
+                   alert("产生未知错误!")
+                   return;
+               }
+            });
+        }
+    </script>
 </head>
 <body>
     <header class="navbar navbar-static-top bs-docs-nav" id="top" role="banner">
@@ -48,25 +67,46 @@
     <hr>
     <hr>
     <div class="container">
-        <form method="get" action="/submit_evaluation" onsubmit="return false;">
+        <form method="get" action="/submit_evaluation" onsubmit="return false;" name="evaluation_name" id="evaluation_name">
             <div class="row">
                 <div class="col-md-1"><b>Accuray</b></div>
                 <div class="col-md-1">
-                    <select name="evaluation" value="1">
-                        <option value="1">Accu@1</option>
-                        <option value="2">Accu@2</option>
-                        <option value="3">Accu@3</option>
-                    </select>
+                    {% if not accuracy or accuracy == '1'%}
+                        <select name="accuracy" id="accuracy">
+                            <option value="1" selected="selected">Accu@1</option>
+                            <option value="2">Accu@2</option>
+                            <option value="3">Accu@3</option>
+                        </select>
+                    {% elif accuracy == '2' %}
+                        <select name="accuracy" id="accuracy">
+                            <option value="1">Accu@1</option>
+                            <option value="2" selected="selected">Accu@2</option>
+                            <option value="3">Accu@3</option>
+                        </select>
+                    {% elif accuracy == '3' %}
+                        <select name="accuracy" id="accuracy">
+                            <option value="1">Accu@1</option>
+                            <option value="2">Accu@2</option>
+                            <option value="3" selected="selected">Accu@3</option>
+                        </select>
+                    {% endif %}
                 </div>
                 <div class="col-md-2" style="margin-left: 30px"><b>Correlation coefficient</b></div>
                 <div class="col-md-3">
-                    <select name="correlation" value="no">
-                        <option value="no">no correlation coefficient</option>
-                        <option value="pearson">Pearson correlation coefficient</option>
-                    </select>
+                    {% if not correlation or correlation == "no" %}
+                        <select name="correlation" id="correlation">
+                            <option value="no" selected="selected">no correlation coefficient</option>
+                            <option value="pearson correlation coefficient">Pearson correlation coefficient</option>
+                        </select>
+                    {% else %}
+                        <select name="correlation" id="correlation">
+                            <option value="no">no correlation coefficient</option>
+                            <option value="pearson correlation coefficient" selected="selected">Pearson correlation coefficient</option>
+                        </select>
+                    {% endif %}
                 </div>
                 <div class="col-md-2">
-                    <input type="submit" value="save"/>
+                    <button onclick="save()">保存设置</button>
                 </div>
             </div>
             <hr>
