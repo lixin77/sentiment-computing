@@ -9,7 +9,7 @@ app.debug = True
 def hello_world():
     return 'Hello World!'
 """
-_evaluation_method = object
+_evaluation_method = dict()
 
 @app.route('/')
 def hello_world():
